@@ -1,0 +1,98 @@
+---
+title: "Project Google Analytics Course"
+output: html_notebook
+---
+
+Data preparation and loading
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+```{r}
+trips <- read.csv("202004-divvy-tripdata.csv")
+head(trips)
+```
+
+
+```{r}
+colnames(trips)
+```
+Data transformation
+```{r}
+time_ <- trips %>% 
+  summarize(difftime(ended_at,started_at,units="mins"))
+
+trips <- data.frame(trips, time_)
+trips <- rename(trips, time_len = difftime.ended_at..started_at..units....mins..)
+head(trips)
+```
+
+```{r}
+trips <- trips %>% 
+  mutate(days = wday(started_at, label=TRUE)) %>% 
+  mutate(days_num = wday(started_at, label=FALSE)) %>% 
+  mutate(hour_ = hour(started_at)) %>% 
+  mutate(Month = month(started_at))
+
+head(trips)
+
+```
+```{r}
+trips %>% 
+  group_by(member_casual) %>% 
+  summarize(mean(time_len))
+```
+
+```{r}
+trips %>% 
+  group_by(member_casual, days) %>% 
+  summarize(mean(time_len))
+```
+
+
+```{r}
+trips %>%
+    arrange(started_at)
+```
+
+
+```{r}
+trips %>% 
+  group_by(member_casual, start_station_name) %>% 
+  #filter(member_casual == "member" & time_len > 21) %>% 
+  filter(member_casual == "casual" & time_len > 73)
+
+```
+
+```{r}
+trips %>% 
+  group_by(member_casual) %>% 
+  summarize(sum(time_len))
+
+```
+
+
+```{r}
+trips %>% 
+  group_by(start_station_name) %>% 
+  summarize(max(time_len))
+```
+
+
+```{r}
+trips %>% 
+  group_by(end_station_name) %>% 
+  summarize(max(time_len))
+```
+
+
+```{r}
+trips %>% 
+  mutate(hour_ = hour(started_at))
+```
+
+
+```{r}
+write.csv(trips, "C:/Users/ASUS/Documents/Proyecto Analisis de Datos/data.csv", row.names=FALSE)
+```
